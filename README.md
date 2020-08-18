@@ -1,98 +1,54 @@
-# ASCIIDraw
+# Cab Data Client
 __Description__
 
-This is a simple console drawing program in Java.
+This is a simple console program written in java to invoke the REST APIs in the cab_data_research project.<br>
 
-The program works as follows:
- 1. Create a new canvas
- 2. Draw on the canvas by issuing various commands
- 3. Quit
+The program works as follows:<br>
+ - provides the main menu which provides the following options:<br>
+ 	1. Get Trip Count For A Cab<br>
+	2. Enter Admin Mode<br>
+	3. Exit<br>
+ - When the user chooses any option, the program provides that action<br>
 
+__Build__
+<br>To build the executable Jar, run the following maven command in the project root directory:<br>
+``$ mvn clean package``
 
-|Command 		|Description|
-|----|----|
-|C w h          | Create a new canvas of width w and height h.|
-|L x1 y1 x2 y2  | Draw a new line from (x1,y1) to (x2,y2). Currently, only|
-|               | horizontal or vertical lines are supported. Horizontal and vertical lines|
-|               | will be drawn using the 'x' character.|
-|R x1 y1 x2 y2  | Draw a rectangle whose upper left corner is (x1,y1) and|
-|               | lower right corner is (x2,y2). Horizontal and vertical lines will be drawn|
-|               | using the 'x' character.|
-|B x y c        | Fill the entire area connected to (x,y) with "colour" c. The|
-|               | behaviour of this is the same as that of the "bucket fill" tool in paint|
-|               | programs.|
-|Q              | Quit|
+It will create a jar cab_data_client.jar in <project root>/target directory.<br>
+
+__Run__
+<br>To run the program:<br>
+``$ java -jar target/cab_data_client.jar``
 
 __Sample Run__
 
-Below is a sample run of the program. User input is prefixed with `enter command: `
-````text
-enter command: C 20 4
---------------------
-|                  |
-|                  |
-|                  |
-|                  |
---------------------
+Below is a sample run of the program.<hr>
 
-enter command: L 1 2 6 2
---------------------
-|                  |
-|xxxxxx            |
-|                  |
-|                  |
---------------------
+======================================<br>
+	<tab>NY Cab Data Lookup CLI<br>
+======================================<br>
 
-enter command: L 6 3 6 4
---------------------
-|                  |
-|xxxxxx            |
-|     x            |
-|     x            |
---------------------
+Please Eneter your choice:
+1. Get Trip Count For A Cab
+2. Enter Admin Mode
+3. Exit
+Your Answer? 2
 
-enter command: R 14 1 18 3
---------------------
-|             xxxxx|
-|xxxxxx       x   x|
-|     x       xxxxx|
-|     x            |
---------------------
+Available actions:
+1. Clear Cache
+2. Exit
+Your Answer? 1
 
-enter command: B 10 3 o
---------------------
-|oooooooooooooxxxxx|
-|xxxxxxooooooox   x|
-|     xoooooooxxxxx|
-|     xoooooooooooo|
---------------------
+Please enter admin username: admin<br>
+Please enter admin password: password<br>
+Success<br>
 
-enter command: L 6 4 13 4
---------------------
-|oooooooooooooxxxxx|
-|xxxxxxooooooox   x|
-|     xoooooooxxxxx|
-|     xxxxxxxxooooo|
---------------------
-
-enter command: B 1 2 .
---------------------
-|oooooooooooooxxxxx|
-|......ooooooox   x|
-|     .oooooooxxxxx|
-|     ........ooooo|
---------------------
-
-enter command: Q
-````
+Available actions:
+1. Clear Cache
+2. Exit
+Your Answer? 2<br>
+Bye!!
 
 
-__Build__
-To build the executable Jar, run the following maven command in the project root directory:
-$ mvn clean package
 
-It will create a jar ASCIIDraw.jar in <project root>/target directory.
 
-__Run__
-To run the program:
-$ java -jar ASCIIDraw.jar
