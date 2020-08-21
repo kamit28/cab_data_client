@@ -5,7 +5,6 @@ import com.dr.assignment.client.exception.InvalidInputException;
 public abstract class AbstractCommand implements Command {
 
 	private static final String OS = System.getProperty("os.name");
-	private static final String LINE_SEPERATOR = System.getProperty("line.separator");
 
 	@Override
 	public abstract void execute() throws InvalidInputException;

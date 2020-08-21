@@ -1,7 +1,5 @@
 package com.dr.assignment.client.model;
 
-import java.util.Date;
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 

@@ -1,13 +1,15 @@
 package com.dr.assignment.client.dal;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpClient.Redirect;
+import java.net.http.HttpClient.Version;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.time.Duration;
 import java.util.Base64;
 
 import com.dr.assignment.client.model.TripSearchRequest;
@@ -21,71 +23,38 @@ public class RestApiInvokerImpl {
 		this.mapper = mapper;
 	}
 
-	public String invokeSearch(TripSearchRequest request, boolean useCache) throws MalformedURLException, IOException {
-		HttpURLConnection con = (HttpURLConnection) new URL(
-				"http://localhost:8080/ny_trips/search?useCache=" + useCache).openConnection();
+	public String invokeSearch(TripSearchRequest request, boolean useCache) throws IOException, InterruptedException {
+		HttpClient client = HttpClient.newBuilder().version(Version.HTTP_2).followRedirects(Redirect.NORMAL).build();
 
 		String requestJson = mapper.writeValueAsString(request);
 		System.out.println("Request is: " + requestJson);
-		con.setRequestMethod("POST");
 
-		con.setDoOutput(true);
-		con.setDoInput(true);
-
-		con.setRequestProperty("Content-Type", "application/json;");
-		con.setRequestProperty("Accept", "application/json");
-		con.setRequestProperty("Method", "POST");
-		OutputStream os = con.getOutputStream();
-		os.write(requestJson.toString().getBytes("UTF-8"));
-		os.close();
-
-		StringBuilder sb = new StringBuilder();
-		int HttpResult = con.getResponseCode();
-		if (HttpResult == HttpURLConnection.HTTP_OK) {
-			BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
-
-			String line = null;
-			while ((line = br.readLine()) != null) {
-				sb.append(line + "\n");
-			}
-			br.close();
-			return sb.toString();
+		var httpRequest = HttpRequest.newBuilder()
+				.uri(URI.create("http://localhost:8080/ny_trips/search?useCache=" + useCache))
+				.timeout(Duration.ofSeconds(30)).header("Content-Type", "application/json;")
+				.header("Accept", "application/json").POST(BodyPublishers.ofString(requestJson)).build();
+		HttpResponse<?> response = client.send(httpRequest, BodyHandlers.ofString());
+		System.out.println(response.statusCode());
+		if (response.statusCode() == 200) {
+			return response.body().toString();
 		} else {
-			System.out.println(con.getResponseCode());
-			System.out.println(con.getResponseMessage());
 			throw new IOException("Not Found");
 		}
 	}
 
-	public boolean clearCache(String username, String password) throws MalformedURLException, IOException {
-		HttpURLConnection con = (HttpURLConnection) new URL("http://localhost:8080/ny_trips/admin/flushCache")
-				.openConnection();
-		String cred = username + ":" + password;
-		byte[] encodeCred = Base64.getEncoder().encode(cred.getBytes(StandardCharsets.UTF_8));
-		String authHeaderValue = "Basic " + new String(encodeCred);
+	public boolean clearCache(String username, String password) throws IOException, InterruptedException {
+		HttpClient client = HttpClient.newBuilder().version(Version.HTTP_2).followRedirects(Redirect.NORMAL).build();
 
-		con.setRequestMethod("GET");
+		String authHeaderValue = "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
 
-		con.setDoOutput(true);
-		con.setDoInput(true);
-
-		con.setRequestProperty("Accept", "application/json");
-		con.setRequestProperty("Method", "GET");
-		con.setRequestProperty("Authorization", authHeaderValue);
-		int responseCode = con.getResponseCode();
-		if (responseCode == HttpURLConnection.HTTP_OK) {
-			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-			String inputLine;
-			StringBuffer response = new StringBuffer();
-
-			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
-			}
-			in.close();
-
-			System.out.println(response.toString());
+		var httpRequest = HttpRequest.newBuilder().uri(URI.create("http://localhost:8080/ny_trips/admin/flushCache"))
+				.timeout(Duration.ofSeconds(30)).header("Authorization", authHeaderValue)
+				.header("Accept", "application/json").GET().build();
+		HttpResponse<?> response = client.send(httpRequest, BodyHandlers.ofString());
+		System.out.println(response.statusCode());
+		if (response.statusCode() == 200) {
 			return true;
-		} else if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+		} else if (response.statusCode() == 401) {
 			System.out.println("Authenication failed!!");
 			return false;
 		} else {

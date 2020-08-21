@@ -31,17 +31,19 @@ public class AdminMenu extends AbstractCommand {
 				System.out.print("Your Answer? ");
 				answer = scanner.nextLine();
 				switch (answer) {
-				case "1":
+				case "1" -> {
 					System.out.print("Please enter admin username: ");
 					String username = scanner.nextLine();
 					System.out.print("Please enter admin password: ");
 					String password = scanner.nextLine();
 					performClearCache(username, password);
-					break;
-				case "2":
+				}
+				case "2" -> {
 					return;
-				default:
+				}
+				default -> {
 					System.out.println("Invalid option! Please try again");
+				}
 				}
 			}
 		}
@@ -54,7 +56,7 @@ public class AdminMenu extends AbstractCommand {
 		} else {
 			try {
 				return restInvoker.clearCache(username, password);
-			} catch (IOException e) {
+			} catch (IOException | InterruptedException e) {
 				System.out.println(e.getLocalizedMessage());
 				return false;
 			}
